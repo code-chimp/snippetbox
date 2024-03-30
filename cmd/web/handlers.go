@@ -15,7 +15,10 @@ func (app *application) getSnippets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, r, http.StatusOK, "home.gohtml", templateData{Snippets: snippets})
+	data := app.newTemplateData(r)
+	data.Snippets = snippets
+
+	app.render(w, r, http.StatusOK, "home.gohtml", data)
 }
 
 func (app *application) getSnippet(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +38,10 @@ func (app *application) getSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, r, http.StatusOK, "view.gohtml", templateData{Snippet: snippet})
+	data := app.newTemplateData(r)
+	data.Snippet = snippet
+
+	app.render(w, r, http.StatusOK, "view.gohtml", data)
 }
 
 func (app *application) getSnippetForm(w http.ResponseWriter, r *http.Request) {
