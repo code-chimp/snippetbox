@@ -2,9 +2,26 @@
 
 {{define "main"}}
     <h2>Latest Snippets</h2>
-    <ul>
-        {{range .Snippets}}
-            <li><a href="/snippet/view/{{.ID}}">{{.Title}}</a></li>
-        {{end}}
-    </ul>
+    {{if .Snippets}}
+        <table>
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Created</th>
+                <th>ID</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .Snippets}}
+                <tr>
+                    <td><a href="/snippet/view/{{.ID}}">{{.Title}}</a></td>
+                    <td>{{.Created}}</td>
+                    <td>#{{.ID}}</td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+    {{else}}
+        <p>There's nothing to see here...</p>
+    {{end}}
 {{end}}

@@ -3,37 +3,19 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"snippetbox.code-chimp.net/internal/models"
 	"strconv"
 )
 
 func (app *application) getSnippets(w http.ResponseWriter, r *http.Request) {
-	files := []string{
-		"./ui/html/base.gohtml",
-		"./ui/html/partials/nav.gohtml",
-		"./ui/html/pages/home.gohtml",
-	}
-
 	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
 
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, r, err)
-		return
-	}
-
-	err = ts.ExecuteTemplate(w, "base", map[string]interface{}{
-		"Snippets": snippets,
-	})
-	if err != nil {
-		app.serverError(w, r, err)
-	}
+	app.render(w, r, http.StatusOK, "home.gohtml", templateData{Snippets: snippets})
 }
 
 func (app *application) getSnippet(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +35,7 @@ func (app *application) getSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "%+v", snippet)
+	app.render(w, r, http.StatusOK, "view.gohtml", templateData{Snippet: snippet})
 }
 
 func (app *application) getSnippetForm(w http.ResponseWriter, r *http.Request) {
