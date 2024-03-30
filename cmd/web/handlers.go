@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
+	"snippetbox.code-chimp.net/internal/models"
 	"strconv"
 )
 
@@ -11,7 +13,13 @@ func (app *application) getSnippets(w http.ResponseWriter, r *http.Request) {
 	files := []string{
 		"./ui/html/base.gohtml",
 		"./ui/html/partials/nav.gohtml",
-		"./ui/html/pages/getSnippets.gohtml",
+		"./ui/html/pages/home.gohtml",
+	}
+
+	snippets, err := app.snippets.Latest()
+	if err != nil {
+		app.serverError(w, r, err)
+		return
 	}
 
 	ts, err := template.ParseFiles(files...)
@@ -20,7 +28,9 @@ func (app *application) getSnippets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", nil)
+	err = ts.ExecuteTemplate(w, "base", map[string]interface{}{
+		"Snippets": snippets,
+	})
 	if err != nil {
 		app.serverError(w, r, err)
 	}
@@ -33,7 +43,17 @@ func (app *application) getSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "Display snippet %d...", id)
+	snippet, err := app.snippets.Get(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			http.NotFound(w, r)
+		} else {
+			app.serverError(w, r, err)
+		}
+		return
+	}
+
+	fmt.Fprintf(w, "%+v", snippet)
 }
 
 func (app *application) getSnippetForm(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +61,15 @@ func (app *application) getSnippetForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) postSnippetForm(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("POST Snippet Form"))
+	title := "O snail"
+	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n- Kobayashi Issa"
+	expires := 7
+
+	id, err := app.snippets.Insert(title, content, expires)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
