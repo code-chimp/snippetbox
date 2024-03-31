@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"github.com/go-playground/form/v4"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -14,9 +15,10 @@ import (
 )
 
 type application struct {
-	logger    *slog.Logger
-	snippets  *models.SnippetModel
-	templates map[string]*template.Template
+	logger      *slog.Logger
+	snippets    *models.SnippetModel
+	templates   map[string]*template.Template
+	formDecoder *form.Decoder
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -53,10 +55,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	formDecoder := form.NewDecoder()
+
 	app := &application{
-		logger:    logger,
-		snippets:  &models.SnippetModel{DB: db},
-		templates: templateCache,
+		logger:      logger,
+		snippets:    &models.SnippetModel{DB: db},
+		templates:   templateCache,
+		formDecoder: formDecoder,
 	}
 
 	logger.Info(
