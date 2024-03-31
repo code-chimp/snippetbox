@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"snippetbox.code-chimp.net/internal/models"
+	"snippetbox.code-chimp.net/internal/validator"
 	"strconv"
-	"strings"
-	"unicode/utf8"
 )
 
 func (app *application) getSnippets(w http.ResponseWriter, r *http.Request) {
@@ -47,10 +46,10 @@ func (app *application) getSnippet(w http.ResponseWriter, r *http.Request) {
 }
 
 type snippetcreateForm struct {
-	Title       string
-	Content     string
-	Expires     int
-	FieldErrors map[string]string
+	Title   string
+	Content string
+	Expires int
+	validator.Validator
 }
 
 func (app *application) getSnippetForm(w http.ResponseWriter, r *http.Request) {
@@ -75,26 +74,16 @@ func (app *application) postSnippetForm(w http.ResponseWriter, r *http.Request) 
 	}
 
 	form := snippetcreateForm{
-		Title:       r.PostForm.Get("title"),
-		Content:     r.PostForm.Get("content"),
-		Expires:     expires,
-		FieldErrors: make(map[string]string),
+		Title:   r.PostForm.Get("title"),
+		Content: r.PostForm.Get("content"),
+		Expires: expires,
 	}
 
 	// validation
-	if strings.TrimSpace(form.Title) == "" {
-		form.FieldErrors["title"] = "Title is required"
-	} else if utf8.RuneCountInString(form.Title) > 100 {
-		form.FieldErrors["title"] = "Title must be less than 100 characters"
-	}
-
-	if strings.TrimSpace(form.Content) == "" {
-		form.FieldErrors["content"] = "Content is required"
-	}
-
-	if form.Expires != 1 && form.Expires != 7 && form.Expires != 365 {
-		form.FieldErrors["expires"] = "Expiry must be 1, 7, or 365 days"
-	}
+	form.CheckField(validator.NotBlank(form.Title), "title", "Title is required")
+	form.CheckField(validator.MaxLength(form.Title, 100), "title", "Title cannot be longer than 100 characters")
+	form.CheckField(validator.NotBlank(form.Content), "content", "Content is required")
+	form.CheckField(validator.PermittedValue(form.Expires, 1, 7, 365), "expires", "Expiry must be 1, 7, or 365 days")
 
 	// send them back if we found errors
 	if len(form.FieldErrors) > 0 {
