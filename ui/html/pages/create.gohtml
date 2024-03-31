@@ -1,0 +1,52 @@
+{{define "title"}}Create new Snippet{{end}}
+
+{{define "main"}}
+    {{with .Form}}
+        <form action="/snippet/create" method="POST">
+            <div>
+                <label for="title">Title:</label>
+                {{with .FieldErrors.title}}
+                    <label for="title" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
+                {{end}}
+                <input type="text" name="title" id="title" value="{{.Title}}">
+            </div>
+            <div>
+                <label for="content">Content</label>
+                {{with .FieldErrors.content}}
+                    <label for="title" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
+                {{end}}
+                <textarea name="content" id="content" cols="30" rows="10">{{.Content}}</textarea>
+            </div>
+            <div>
+                <label for="expires365">Delete in:</label>
+                {{with .FieldErrors.expires}}
+                    <label for="title" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
+                {{end}}
+                <label>
+                    <input type="radio"
+                           name="expires"
+                           id="expires365"
+                           value="365"
+                           {{if (eq .Expires 365)}}checked{{end}}> 1 year
+                </label>
+                <label>
+                    <input type="radio"
+                           name="expires"
+                           id="expires7"
+                           value="7"
+                           {{if (eq .Expires 7)}}checked{{end}}> One week
+                </label>
+                <label>
+                    <input type="radio"
+                           name="expires"
+                           id="expires1"
+                           value="1"
+                           {{if (eq .Expires 1)}}checked{{end}}> One day
+                </label>
+            </div>
+            <div>
+                <input type="submit" value="Publish snippet">
+            </div>
+        </form>
+    {{end}}
+{{end}}

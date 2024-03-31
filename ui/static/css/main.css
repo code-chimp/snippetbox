@@ -191,6 +191,7 @@ form label {
 
 .error {
     color: #C0392B;
+    font-size: smaller;
     font-weight: bold;
     display: block;
 }
