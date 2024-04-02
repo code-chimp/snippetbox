@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/code-chimp/snippetbox/internal/models"
 	"html/template"
 	"path/filepath"
-	"snippetbox.code-chimp.net/internal/models"
 	"time"
 )
 
@@ -12,6 +12,7 @@ type templateData struct {
 	Snippet     models.Snippet
 	Snippets    []models.Snippet
 	Form        any
+	Flash       string
 }
 
 // humanDate returns a human readable string representation of a time.Time object.

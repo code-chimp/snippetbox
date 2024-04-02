@@ -3,12 +3,13 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/code-chimp/snippetbox/internal/models"
+	"github.com/code-chimp/snippetbox/internal/validator"
 	"net/http"
-	"snippetbox.code-chimp.net/internal/models"
-	"snippetbox.code-chimp.net/internal/validator"
 	"strconv"
 )
 
+// getSnippets displays the most recent snippets.
 func (app *application) getSnippets(w http.ResponseWriter, r *http.Request) {
 	snippets, err := app.snippets.Latest()
 	if err != nil {
@@ -22,6 +23,7 @@ func (app *application) getSnippets(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, http.StatusOK, "home.gohtml", data)
 }
 
+// getSnippet displays a specific snippet based on its ID.
 func (app *application) getSnippet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil || id < 1 {
@@ -45,24 +47,26 @@ func (app *application) getSnippet(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, http.StatusOK, "view.gohtml", data)
 }
 
-type snippetcreateForm struct {
+type snippetCreateForm struct {
 	Title               string `form:"title"`
 	Content             string `form:"content"`
 	Expires             int    `form:"expires"`
 	validator.Validator `form:"-"`
 }
 
+// getSnippetForm displays the snippet form.
 func (app *application) getSnippetForm(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
-	data.Form = snippetcreateForm{
+	data.Form = snippetCreateForm{
 		Expires: 365,
 	}
 
 	app.render(w, r, http.StatusOK, "create.gohtml", data)
 }
 
+// postSnippetForm handles the submission of the snippet form.
 func (app *application) postSnippetForm(w http.ResponseWriter, r *http.Request) {
-	var form snippetcreateForm
+	var form snippetCreateForm
 
 	err := app.decodePostForm(r, &form)
 	if err != nil {
@@ -77,7 +81,7 @@ func (app *application) postSnippetForm(w http.ResponseWriter, r *http.Request) 
 	form.CheckField(validator.PermittedValue(form.Expires, 1, 7, 365), "expires", "Expiry must be 1, 7, or 365 days")
 
 	// send them back if we found errors
-	if len(form.FieldErrors) > 0 {
+	if !form.Valid() {
 		data := app.newTemplateData(r)
 		data.Form = form
 
@@ -91,6 +95,8 @@ func (app *application) postSnippetForm(w http.ResponseWriter, r *http.Request) 
 		app.serverError(w, r, err)
 		return
 	}
+
+	app.sessionManager.Put(r.Context(), "flash", "Snippet successfully created!")
 
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }

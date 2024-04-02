@@ -4,21 +4,25 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
+	"github.com/code-chimp/snippetbox/internal/models"
 	"github.com/go-playground/form/v4"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
-	"snippetbox.code-chimp.net/internal/models"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type application struct {
-	logger      *slog.Logger
-	snippets    *models.SnippetModel
-	templates   map[string]*template.Template
-	formDecoder *form.Decoder
+	logger         *slog.Logger
+	snippets       *models.SnippetModel
+	templates      map[string]*template.Template
+	formDecoder    *form.Decoder
+	sessionManager *scs.SessionManager
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -57,11 +61,16 @@ func main() {
 
 	formDecoder := form.NewDecoder()
 
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
+
 	app := &application{
-		logger:      logger,
-		snippets:    &models.SnippetModel{DB: db},
-		templates:   templateCache,
-		formDecoder: formDecoder,
+		logger:         logger,
+		snippets:       &models.SnippetModel{DB: db},
+		templates:      templateCache,
+		formDecoder:    formDecoder,
+		sessionManager: sessionManager,
 	}
 
 	logger.Info(
