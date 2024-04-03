@@ -4,6 +4,14 @@ This is a simple web application written in Go that allows users to create, view
 edit, and delete snippets of text. It is based on the book ["Let's Go"][letsgo]
 by [Alex Edwards](https://www.alexedwards.net/).
 
+## Prerequisites
+
+- [Go 1.22](https://go.dev/) or later
+- [Air](https://github.com/cosmtrek/air) for live reloading:
+  ```shell
+  go install github.com/cosmtrek/air
+  ```
+
 ## Prep the Database
 
 Create a Docker instance of MariaDB for development purposes:
@@ -16,6 +24,19 @@ docker run --name snippetbox_dev \
     -e 'MARIADB_PASSWORD=S00p3r*S3kr1t' \
     -e 'MARIADB_DATABASE=snippetbox' \
     -d mariadb:11
+    
+```
+On Windows, use the following command:
+
+```powershell
+docker run --name snippetbox_dev `
+    -p 3306:3306 `
+    -e 'MARIADB_ROOT_PASSWORD=P@ssw0rd' `
+    -e 'MARIADB_USER=snippets-admin' `
+    -e 'MARIADB_PASSWORD=S00p3r*S3kr1t' `
+    -e 'MARIADB_DATABASE=snippetbox' `
+    -d mariadb:11
+
 ```
 
 Create table and seed some data - login as `snippets-admin` and run:
@@ -55,7 +76,11 @@ For development purposes, generate a self-signed certificate:
 ```shell
 go run /usr/local/go/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost
 ```
+On Windows if you have the default Go installation path:
 
+```powershell
+go run "C:\Program Files\Go\src\crypto\tls\generate_cert.go" --rsa-bits=2048 --host=localhost
+```
 
 
 [letsgo]: https://lets-go.alexedwards.net/ "Let's Go"
