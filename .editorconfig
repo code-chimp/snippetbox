@@ -1,0 +1,16 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+trim_trailing_whitespace = true
+
+[*.{css,gohtml,html,js,json,md,ps1,scss,sh,ts,tsx}]
+indent_size = 2
+
+[*.go]
+indent_size = 4
+indent_style = tab
+
+[*.md]
+trim_trailing_whitespace = false

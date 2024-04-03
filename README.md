@@ -11,36 +11,24 @@ by [Alex Edwards](https://www.alexedwards.net/).
   ```shell
   go install github.com/cosmtrek/air
   ```
+- [Docker](https://www.docker.com/) for running MariaDB in a container
 
 ## Prep the Database
 
-Create a Docker instance of MariaDB for development purposes:
+To create a Docker instance of MariaDB for development purposes, run the appropriate script from the `./data-scripts` directory:
 
 ```shell
-docker run --name snippetbox_dev \
-    -p 3306:3306 \
-    -e 'MARIADB_ROOT_PASSWORD=P@ssw0rd' \
-    -e 'MARIADB_USER=snippets-admin' \
-    -e 'MARIADB_PASSWORD=S00p3r*S3kr1t' \
-    -e 'MARIADB_DATABASE=snippetbox' \
-    -d mariadb:11
-    
+./data-scripts/setup.sh    
 ```
-On Windows, use the following command:
+or:
 
 ```powershell
-docker run --name snippetbox_dev `
-    -p 3306:3306 `
-    -e 'MARIADB_ROOT_PASSWORD=P@ssw0rd' `
-    -e 'MARIADB_USER=snippets-admin' `
-    -e 'MARIADB_PASSWORD=S00p3r*S3kr1t' `
-    -e 'MARIADB_DATABASE=snippetbox' `
-    -d mariadb:11
-
+.\data-scripts\setup.ps1
 ```
 
 Create table and seed some data - login as `snippets-admin` and run:
 
+Contents available in `./data-scripts/seed_schema.sql`:
 ```mariadb
 CREATE TABLE snippets (
   id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -55,7 +43,7 @@ CREATE INDEX idx_snippets_created ON snippets (created);
 INSERT INTO snippets
   (title, content, created, expires)
 VALUES
-  ('An old silent pond', 'An old silent pond...\nA frog jumps into the pond,\nsplash! Silence again.\n\n- Matsuo Basho', UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL 365 DAY)),
+  ('An old silent pond', 'An old silent pond...\nA frog jumps into the pond,\nsplash! Silence again.\n\n- Matsuo Bashō', UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL 365 DAY)),
   ('Over the wintry forest', 'Over the\nwintry forest, winds howl in rage\nwith no leaves to blow.\n\n- Natsume Soseki', UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL 365 DAY)),
   ('First autumn morning', 'First autumn morning\nthe mirror I stare into\nshows my father''s face.\n\n- Murakami Kijo', UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL 7 DAY));
 
@@ -74,11 +62,13 @@ CREATE INDEX sessions_expiry ON sessions (expiry);
 For development purposes, generate a self-signed certificate:
 
 ```shell
+cd ./tls
 go run /usr/local/go/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost
 ```
 On Windows if you have the default Go installation path:
 
 ```powershell
+cd .\tls
 go run "C:\Program Files\Go\src\crypto\tls\generate_cert.go" --rsa-bits=2048 --host=localhost
 ```
 
