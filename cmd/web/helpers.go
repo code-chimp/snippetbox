@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/form/v4"
+	"github.com/justinas/nosurf"
 	"net/http"
 	"runtime/debug"
 	"time"
@@ -53,11 +54,14 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 // newTemplateData creates a new templateData struct.
 func (app *application) newTemplateData(r *http.Request) templateData {
 	return templateData{
-		CurrentYear: time.Now().Year(),
-		Flash:       app.sessionManager.PopString(r.Context(), "flash"),
+		CurrentYear:     time.Now().Year(),
+		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: app.isAuthenticated(r),
+		CSRFToken:       nosurf.Token(r),
 	}
 }
 
+// decodePostForm decodes the form data from a POST request and populates the destination struct.
 func (app *application) decodePostForm(r *http.Request, dst any) error {
 	if err := r.ParseForm(); err != nil {
 		return err
@@ -75,4 +79,9 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 	}
 
 	return nil
+}
+
+// isAuthenticated checks if the user is authenticated.
+func (app *application) isAuthenticated(r *http.Request) bool {
+	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
 }

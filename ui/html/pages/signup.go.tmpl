@@ -2,36 +2,35 @@
 {{define "title"}}New User{{end}}
 
 {{define "main"}}
-  {{with .Form}}
-    <form action="/user/signup" method="POST">
-      <div>
-        <label for="name">Name:</label>
-        {{with .FieldErrors.name}}
-          <label for="name" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
-        {{end}}
-        <input type="text" name="name" id="name" value="{{.Name}}">
-      </div>
-      <div>
-        <label for="email">Email:</label>
-        {{with .FieldErrors.email}}
-          <label for="email" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
-        {{end}}
-        <input type="email" name="email" id="email" value="{{.Email}}"/>
-      </div>
-      <div>
-        <label for="password">Password:</label>
-        {{with .FieldErrors.password}}
-          <label for="password" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
-        {{end}}
-        <input type="password" name="password" id="password" value="{{.Password}}"/>
-      </div>
-      <div>
-        <label for="verify">Verify Password:</label>
-        <input type="password" name="verify" id="verify" value="{{.Verify}}"/>
-      </div>
-      <div>
-        <input type="submit" value="Signup">
-      </div>
-    </form>
-  {{end}}
+  <form action="/user/signup" method="POST">
+    <div>
+      <label for="name">Name:</label>
+      {{with .Form.FieldErrors.name}}
+        <label for="name" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
+      {{end}}
+      <input type="text" name="name" id="name" value="{{.Form.Name}}">
+    </div>
+    <div>
+      <label for="email">Email:</label>
+      {{with .Form.FieldErrors.email}}
+        <label for="email" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
+      {{end}}
+      <input type="email" name="email" id="email" value="{{.Form.Email}}"/>
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      {{with .Form.FieldErrors.password}}
+        <label for="password" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
+      {{end}}
+      <input type="password" name="password" id="password" value="{{.Form.Password}}"/>
+    </div>
+    <div>
+      <label for="verify">Verify Password:</label>
+      <input type="password" name="verify" id="verify" value="{{.Form.Verify}}"/>
+    </div>
+    <div>
+      <input type="submit" value="Signup">
+    </div>
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}"/>
+  </form>
 {{end}}

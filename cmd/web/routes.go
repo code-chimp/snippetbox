@@ -9,7 +9,9 @@ func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	// Create a new middleware chain for dynamic requests
-	dynamic := alice.New(app.sessionManager.LoadAndSave)
+	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf)
+	// Add the requireAuthentication middleware to the dynamic middleware chain
+	protected := dynamic.Append(app.requireAuthentication)
 
 	// Serve static files from the "./ui/static/" directory
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
@@ -17,8 +19,8 @@ func (app *application) routes() http.Handler {
 
 	mux.Handle("GET /{$}", dynamic.ThenFunc(app.getSnippets))
 	mux.Handle("GET /snippet/view/{id}", dynamic.ThenFunc(app.getSnippet))
-	mux.Handle("GET /snippet/create", dynamic.ThenFunc(app.getSnippetForm))
-	mux.Handle("POST /snippet/create", dynamic.ThenFunc(app.postSnippetForm))
+	mux.Handle("GET /snippet/create", protected.ThenFunc(app.getSnippetForm))
+	mux.Handle("POST /snippet/create", protected.ThenFunc(app.postSnippetForm))
 
 	mux.Handle("GET /user/signup", dynamic.ThenFunc(app.getSignupForm))
 	mux.Handle("POST /user/signup", dynamic.ThenFunc(app.postSignupForm))
