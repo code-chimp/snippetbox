@@ -23,3 +23,15 @@ CREATE TABLE sessions (
 );
 
 CREATE INDEX sessions_expiry ON sessions (expiry);
+
+-- For the latter chapter on user management
+
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  hashed_password VARCHAR(60) NOT NULL,
+  created DATETIME NOT NULL
+);
+
+ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);

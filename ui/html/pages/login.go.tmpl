@@ -1,0 +1,29 @@
+{{- /* gotype: github.com/code-chimp/snippetbox/cmd/web.templateData */ -}}
+{{define "title"}}New User{{end}}
+
+{{define "main"}}
+  {{with .Form}}
+    <form action="/user/login" method="POST">
+      {{range .GeneralErrors}}
+        <div class="error">{{.}}</div>
+      {{end}}
+      <div>
+        <label for="email">Email:</label>
+        {{with .FieldErrors.email}}
+          <label for="email" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
+        {{end}}
+        <input type="email" name="email" id="email" value="{{.Email}}"/>
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        {{with .FieldErrors.password}}
+          <label for="password" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
+        {{end}}
+        <input type="password" name="password" id="password" value="{{.Password}}"/>
+      </div>
+      <div>
+        <input type="submit" value="Login">
+      </div>
+    </form>
+  {{end}}
+{{end}}

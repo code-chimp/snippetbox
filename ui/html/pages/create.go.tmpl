@@ -1,3 +1,4 @@
+{{- /* gotype: github.com/code-chimp/snippetbox/cmd/web.templateData */ -}}
 {{define "title"}}Create new Snippet{{end}}
 
 {{define "main"}}
@@ -13,14 +14,14 @@
       <div>
         <label for="content">Content</label>
         {{with .FieldErrors.content}}
-          <label for="title" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
+          <label for="email" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
         {{end}}
         <textarea name="content" id="content" cols="30" rows="10">{{.Content}}</textarea>
       </div>
       <div>
         <label for="expires365">Delete in:</label>
         {{with .FieldErrors.expires}}
-          <label for="title" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
+          <label for="expires365" role="alert" aria-live="assertive" aria-atomic="true" class="error">{{.}}</label>
         {{end}}
         <label>
           <input type="radio"

@@ -7,9 +7,9 @@ by [Alex Edwards](https://www.alexedwards.net/).
 ## Prerequisites
 
 - [Go 1.22](https://go.dev/) or later
-- [Air](https://github.com/cosmtrek/air) for live reloading:
+- [Air](https://github.com/air-verse/air) for live reloading:
   ```shell
-  go install github.com/cosmtrek/air
+  go install github.com/air-verse/air
   ```
 - [Docker](https://www.docker.com/) for running MariaDB in a container
 
@@ -18,12 +18,11 @@ by [Alex Edwards](https://www.alexedwards.net/).
 To create a Docker instance of MariaDB for development purposes, run the appropriate script from the `./data-scripts` directory:
 
 ```shell
+# Linux/macOS
 ./data-scripts/setup.sh    
-```
-or:
 
-```powershell
-.\data-scripts\setup.ps1
+# or windows
+. .\data-scripts\setup.ps1
 ```
 
 Create table and seed some data - login as `snippets-admin` and run:
@@ -70,6 +69,16 @@ On Windows if you have the default Go installation path:
 ```powershell
 cd .\tls
 go run "C:\Program Files\Go\src\crypto\tls\generate_cert.go" --rsa-bits=2048 --host=localhost
+```
+
+## Development
+
+```shell
+# Start the development server (Linux / MacOS)
+air
+
+# Windows
+air -c .air-win.toml
 ```
 
 

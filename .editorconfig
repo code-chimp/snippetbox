@@ -5,7 +5,7 @@ charset = utf-8
 indent_style = space
 trim_trailing_whitespace = true
 
-[*.{css,gohtml,html,js,json,md,ps1,scss,sh,ts,tsx}]
+[*.{css,gohtml,html,js,json,md,ps1,scss,sh,tmpl,ts,tsx}]
 indent_size = 2
 
 [*.go]

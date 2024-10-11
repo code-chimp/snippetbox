@@ -29,7 +29,7 @@ var functions = template.FuncMap{
 func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
-	pages, err := filepath.Glob("./ui/html/pages/*.gohtml")
+	pages, err := filepath.Glob("./ui/html/pages/*.tmpl")
 	if err != nil {
 		return nil, err
 	}
@@ -38,13 +38,13 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		name := filepath.Base(page)
 
 		// parse base template to create a new template set
-		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.gohtml")
+		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.go.tmpl")
 		if err != nil {
 			return nil, err
 		}
 
 		// parse all partials and add them to the template set
-		ts, err = ts.ParseGlob("./ui/html/partials/*.gohtml")
+		ts, err = ts.ParseGlob("./ui/html/partials/*.tmpl")
 		if err != nil {
 			return nil, err
 		}
