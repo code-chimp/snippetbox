@@ -1,31 +1,22 @@
-package models
+package services
 
 import (
 	"database/sql"
 	"errors"
-	"time"
+	"github.com/code-chimp/snippetbox/internal/models"
 )
 
-// Snippet represents a snippet persisted to storage.
-type Snippet struct {
-	ID      int
-	Title   string
-	Content string
-	Created time.Time
-	Expires time.Time
-}
-
-// SnippetModel wraps a sql.DB connection pool.
-type SnippetModel struct {
+// SnippetsService wraps a sql.DB connection pool.
+type SnippetsService struct {
 	DB *sql.DB
 }
 
 // Insert will insert a new snippet into the database.
-func (m *SnippetModel) Insert(title string, content string, expires int) (int, error) {
+func (m *SnippetsService) Insert(title string, content string, expires int) (int, error) {
 	query := `INSERT INTO snippets
-		(title, content, created, expires)
-      	VALUES
-      	(?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY))`
+		      (title, content, created, expires)
+      	      VALUES
+      	      (?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY))`
 
 	result, err := m.DB.Exec(query, title, content, expires)
 	if err != nil {
@@ -41,19 +32,19 @@ func (m *SnippetModel) Insert(title string, content string, expires int) (int, e
 }
 
 // Get will return a specific snippet based on its id.
-func (m *SnippetModel) Get(id int) (Snippet, error) {
+func (m *SnippetsService) Get(id int) (models.Snippet, error) {
 	query := `SELECT id, title, content, created, expires
               FROM snippets
               WHERE expires > UTC_TIMESTAMP() AND id = ?`
 
-	var s Snippet
+	var s models.Snippet
 
 	err := m.DB.QueryRow(query, id).Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return Snippet{}, ErrNoRecord
+			return models.Snippet{}, models.ErrNoRecord
 		} else {
-			return Snippet{}, err
+			return models.Snippet{}, err
 		}
 	}
 
@@ -61,7 +52,7 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 }
 
 // Latest will return the 10 most recently created snippets.
-func (m *SnippetModel) Latest() ([]Snippet, error) {
+func (m *SnippetsService) Latest() ([]models.Snippet, error) {
 	query := `SELECT id, title, content, created, expires
               FROM snippets
               WHERE expires > UTC_TIMESTAMP()
@@ -75,10 +66,10 @@ func (m *SnippetModel) Latest() ([]Snippet, error) {
 
 	defer rows.Close()
 
-	var snippets []Snippet
+	var snippets []models.Snippet
 
 	for rows.Next() {
-		var s Snippet
+		var s models.Snippet
 
 		err := rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 		if err != nil {

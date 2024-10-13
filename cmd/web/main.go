@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/alexedwards/scs/mysqlstore"
 	"github.com/alexedwards/scs/v2"
-	"github.com/code-chimp/snippetbox/internal/models"
+	"github.com/code-chimp/snippetbox/internal/services"
 	"github.com/go-playground/form/v4"
 	"html/template"
 	"log/slog"
@@ -21,8 +21,8 @@ import (
 // application struct holds the application-wide dependencies.
 type application struct {
 	logger         *slog.Logger
-	snippets       *models.SnippetModel
-	users          *models.UserModel
+	snippets       *services.SnippetsService
+	users          *services.UsersService
 	templates      map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
@@ -70,8 +70,8 @@ func main() {
 
 	app := &application{
 		logger:         logger,
-		snippets:       &models.SnippetModel{DB: db},
-		users:          &models.UserModel{DB: db},
+		snippets:       &services.SnippetsService{DB: db},
+		users:          &services.UsersService{DB: db},
 		templates:      templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
